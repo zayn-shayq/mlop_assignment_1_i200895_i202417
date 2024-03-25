@@ -1,9 +1,5 @@
 pipeline {
     agent any
-        triggers {
-        // Trigger the build on push events
-        GitHubPushTrigger()
-        }
     environment {
         DOCKERHUB_CREDENTIALS = credentials('docker-hub-credentials')
         RECIPIENT = 'i200895@nu.edu.pk'
