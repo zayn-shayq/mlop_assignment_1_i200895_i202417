@@ -1,90 +1,65 @@
-# Import libraries
 import pandas as pd
 import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler, OrdinalEncoder
-from sklearn.linear_model import DecisionTreeClassifier, RandomForestClassifier
-from sklearn.linear_model import GradientBoostingClassifier
 from sklearn.metrics import accuracy_score
 from sklearn.pipeline import make_pipeline
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
 import pickle
 import warnings
 
-# Suppress warnings for cleaner output
+# Suppress all warnings
 warnings.filterwarnings('ignore')
 
-# Load Dataset
-data = pd.read_csv('Dataset.csv')
+# Function to load and preprocess data
+def load_and_preprocess_data(filepath):
+    data = pd.read_csv(filepath)
+    # Fill missing values for categorical data
+    categorical_cols = data.select_dtypes(include=['object']).columns
+    for col in categorical_cols:
+        data[col] = data[col].fillna(data[col].mode()[0])
+    # Ordinal encoding for categorical columns
+    encoder = OrdinalEncoder()
+    data[categorical_cols] = encoder.fit_transform(data[categorical_cols])
+    return data
 
-# Display initial data info
-print(data.head())
-print(data.info())
+# Function for splitting dataset
+def split_dataset(data, target):
+    X = data.drop(target, axis=1)
+    y = data[target]
+    return train_test_split(X, y, test_size=0.3, random_state=42)
 
-# Data Distribution Visualization
-category_counts = data['Accident_Probability'].value_counts()
-plt.figure(figsize=(8, 8))
-plt.pie(category_counts, labels=category_counts.index, autopct='%1.1f%%', 
-        startangle=140)
-plt.title('Pie Chart of Category Distribution of Accident Severity')
-plt.show()
+# Function to train models and compare their performance
+def train_and_compare_models(X_train, X_test, y_train, y_test):
+    models = {
+        "Decision Tree": DecisionTreeClassifier(),
+        "Random Forest": RandomForestClassifier(),
+        "Gradient Boosting": GradientBoostingClassifier()
+    }
+    results = {}
+    for name, model in models.items():
+        pipeline = make_pipeline(StandardScaler(), model)
+        pipeline.fit(X_train, y_train)
+        predictions = pipeline.predict(X_test)
+        accuracy = accuracy_score(y_test, predictions)
+        results[name] = accuracy
+    return results
 
-# Handling Missing Values
-for column in data.columns:
-    if data[column].dtype == 'object':
-        data[column] = data[column].fillna(data[column].mode()[0])
+# Main execution function
+def main():
+    data = load_and_preprocess_data('Dataset.csv')
+    X_train, X_test, y_train, y_test = split_dataset(data, 'Accident_Probability')
+    results = train_and_compare_models(X_train, X_test, y_train, y_test)
+    # Display results
+    plt.bar(results.keys(), results.values(), color=['blue', 'green', 'red'])
+    plt.xlabel('Model')
+    plt.ylabel('Accuracy')
+    plt.title('Model Comparison')
+    plt.show()
+    # Save the Decision Tree model as an example
+    dt_model = DecisionTreeClassifier().fit(X_train, y_train)
+    pickle.dump(dt_model, open('dt_model.pkl', 'wb'))
 
-# Encode Categorical Variables
-categorical_columns = data.select_dtypes(include=['object']).columns.tolist()
-ordinal_encoder = OrdinalEncoder()
-data[categorical_columns] = ordinal_encoder.fit_transform(data[categorical_columns])
-
-# Change data type of numeric columns
-numeric_columns = data.select_dtypes(include=['int64', 'float64']).columns.tolist()
-data[numeric_columns] = data[numeric_columns].apply(pd.to_numeric, 
-                                                     downcast='float')
-
-# Split the Dataset
-X = data.drop('Accident_Probability', axis=1)
-y = data['Accident_Probability']
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, 
-                                                    random_state=42)
-
-# Model Training with Comparison
-models = {
-    "Decision Tree": DecisionTreeClassifier(),
-    "Random Forest": RandomForestClassifier(),
-    "Gradient Boosting": GradientBoostingClassifier()
-}
-
-results = {}
-for name, model in models.items():
-    pipeline = make_pipeline(StandardScaler(), model)
-    pipeline.fit(X_train, y_train)
-    predictions = pipeline.predict(X_test)
-    accuracy = accuracy_score(y_test, predictions)
-    results[name] = accuracy
-
-# Model Comparison Visualization
-plt.figure(figsize=(10, 6))
-plt.bar(results.keys(), results.values(), color=['green', 'red', 'purple'])
-plt.xlabel('Model')
-plt.ylabel('Accuracy')
-plt.title('Model Comparison')
-plt.ylim([0, 1])
-plt.show()
-
-# Train Decision Tree Model as an Example
-dt = DecisionTreeClassifier()
-dt.fit(X_train, y_train)
-
-# Generate and Save Model Pickle File
-pickle.dump(dt, open('model.pkl', 'wb'))
-
-# Load the model for demonstration purposes
-with open('model.pkl', 'rb') as file:
-    loaded_model = pickle.load(file)
-
-# Demonstration prediction
-input_data = [2, 2, 2, 2, 2, 2]  # Example input
-prediction = loaded_model.predict([input_data])
-print({'prediction': prediction.tolist()})
+if __name__ == "__main__":
+    main()
