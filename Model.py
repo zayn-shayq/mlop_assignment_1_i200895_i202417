@@ -5,10 +5,11 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler, OrdinalEncoder
 from sklearn.linear_model import DecisionTreeClassifier, RandomForestClassifier, GradientBoostingClassifier
 from sklearn.metrics import accuracy_score
+from sklearn.pipeline import make_pipeline
 import pickle
-
-# Supress warnings
 import warnings
+
+# Suppress warnings for cleaner output
 warnings.filterwarnings('ignore')
 
 # Load Dataset
@@ -18,7 +19,7 @@ data = pd.read_csv('Dataset.csv')
 print(data.head())
 print(data.info())
 
-# Data Distribution
+# Data Distribution Visualization
 category_counts = data['Accident_Probability'].value_counts()
 plt.figure(figsize=(8, 8))
 plt.pie(category_counts, labels=category_counts.index, autopct='%1.1f%%', startangle=140)
@@ -44,7 +45,7 @@ X = data.drop('Accident_Probability', axis=1)
 y = data['Accident_Probability']
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
 
-# Model Training
+# Model Training with Comparison
 models = {
     "Decision Tree": DecisionTreeClassifier(),
     "Random Forest": RandomForestClassifier(),
@@ -59,7 +60,7 @@ for name, model in models.items():
     accuracy = accuracy_score(y_test, predictions)
     results[name] = accuracy
 
-# Model Comparison
+# Model Comparison Visualization
 plt.figure(figsize=(10, 6))
 plt.bar(results.keys(), results.values(), color=['green', 'red', 'purple'])
 plt.xlabel('Model')
@@ -68,18 +69,18 @@ plt.title('Model Comparison')
 plt.ylim([0, 1])
 plt.show()
 
-# Decision Tree Model
+# Train Decision Tree Model as an Example
 dt = DecisionTreeClassifier()
 dt.fit(X_train, y_train)
 
-# Generate Pickle File
+# Generate and Save Model Pickle File
 pickle.dump(dt, open('model.pkl', 'wb'))
 
-# Load the model for demonstration
+# Load the model for demonstration purposes
 with open('model.pkl', 'rb') as file:
     loaded_model = pickle.load(file)
 
-# Make a demonstration prediction
-input_data = [2, 2, 2, 2, 2, 2]
+# Demonstration prediction
+input_data = [2, 2, 2, 2, 2, 2]  # Example input, ensure this matches your model's expectations
 prediction = loaded_model.predict([input_data])
 print({'prediction': prediction.tolist()})
