@@ -5,3 +5,4 @@ plotly
 seaborn
 scikit-learn
 Flask>=1.1.2
+pytest>=x.y.z
