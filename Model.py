@@ -9,8 +9,10 @@ from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
 import pickle
 import warnings
 
+
 # Suppress all warnings
 warnings.filterwarnings('ignore')
+
 
 # Function to load and preprocess data
 def load_and_preprocess_data(filepath):
@@ -24,11 +26,13 @@ def load_and_preprocess_data(filepath):
     data[categorical_cols] = encoder.fit_transform(data[categorical_cols])
     return data
 
+
 # Function for splitting dataset
 def split_dataset(data, target):
     X = data.drop(target, axis=1)
     y = data[target]
     return train_test_split(X, y, test_size=0.3, random_state=42)
+
 
 # Function to train models and compare their performance
 def train_and_compare_models(X_train, X_test, y_train, y_test):
@@ -46,6 +50,7 @@ def train_and_compare_models(X_train, X_test, y_train, y_test):
         results[name] = accuracy
     return results
 
+
 # Main execution function
 def main():
     data = load_and_preprocess_data('Dataset.csv')
@@ -60,6 +65,7 @@ def main():
     # Save the Decision Tree model as an example
     dt_model = DecisionTreeClassifier().fit(X_train, y_train)
     pickle.dump(dt_model, open('dt_model.pkl', 'wb'))
+
 
 if __name__ == "__main__":
     main()
