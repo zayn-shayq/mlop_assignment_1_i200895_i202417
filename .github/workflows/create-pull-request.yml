@@ -30,8 +30,8 @@ jobs:
       if: success() # Ensures the PR is created only if tests pass
       uses: repo-sync/pull-request@v2
       with:
-        source_branch: "test" # Your source branch
-        destination_branch: "main" # Branch to create PR to
-        pr_title: "Automated PR: Update master branch" # Title of the PR
-        pr_body: "Automated PR to merge dev-branch changes into the master branch." # Content of the PR message
-        github_token: ${{ secrets.GITHUB_TOKEN }} # Provided by GitHub Actions
+       source_branch: "dev-branch" # Your source branch
+       destination_branch: "master" # Branch to create PR to
+       pr_title: "Automated PR: Update master branch" # Title of the PR
+       pr_body: "Automated PR to merge dev-branch changes into the master branch." # Content of the PR message
+       github_token: ${{ secrets.PERSONAL_ACCESS_TOKEN }} # Use the PAT instead of GITHUB_TOKEN
