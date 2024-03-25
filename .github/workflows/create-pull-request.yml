@@ -3,7 +3,7 @@ name: Auto PR to Master
 on:
   push:
     branches:
-      - dev
+      - test
 
 jobs:
   test-and-create-pr:
@@ -30,7 +30,7 @@ jobs:
       if: success() # Ensures the PR is created only if tests pass
       uses: repo-sync/pull-request@v2
       with:
-        source_branch: "dev" # Your source branch
+        source_branch: "test" # Your source branch
         destination_branch: "main" # Branch to create PR to
         pr_title: "Automated PR: Update master branch" # Title of the PR
         pr_body: "Automated PR to merge dev-branch changes into the master branch." # Content of the PR message
