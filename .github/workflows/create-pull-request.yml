@@ -1,4 +1,4 @@
-name: Auto PR to Master
+name: Python Testing and Auto PR to Master
 
 on:
   push:
@@ -16,7 +16,7 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v2
       with:
-        python-version: '3.x' 
+        python-version: '3.x'
 
     - name: Install dependencies
       run: |
@@ -24,20 +24,14 @@ jobs:
         pip install -r requirements.txt
 
     - name: Run Pytest
-      run: pytest test.py # Replace with your test command or file
+      run: pytest test.py
 
     - name: Create Pull Request
-    env:
-      GITHUB_TOKEN: ${{ secrets.MY_PERSONAL_TOKEN }}
-      run: |
-        PR_DATA=$(jq -n --arg title "Automated PR: Update master branch" \
-          --arg head "test" \
-          --arg base "main" \
-          --arg body "Automated PR to merge changes from test into the main branch." \
-          '{title: $title, head: $head, base: $base, body: $body}')
-        curl \
-          -X POST \
-          -H "Authorization: token $GITHUB_TOKEN" \
-          -H "Accept: application/vnd.github.v3+json" \
-          https://api.github.com/repos/${{ github.repository }}/pulls \
-          -d "$PR_DATA"
+      if: success()
+      uses: repo-sync/pull-request@v2
+      with:
+        source_branch: "test" # Your source branch
+        destination_branch: "main" # Branch to create PR to
+        pr_title: "Automated PR: Update master branch" # Title of the PR
+        pr_body: "Automated PR to merge dev-branch changes into the master branch." # Content of the PR message
+        github_token: ${{ secrets.MY_PERSONAL_TOKEN }} # Provided by GitHub Actions
