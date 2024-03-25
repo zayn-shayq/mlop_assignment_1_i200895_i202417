@@ -4,5 +4,6 @@ pandas
 plotly
 seaborn
 scikit-learn
+flask
 pytest
 
