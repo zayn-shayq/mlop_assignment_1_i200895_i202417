@@ -4,6 +4,6 @@ pandas
 plotly
 seaborn
 scikit-learn
-Flask>=1.1.2
+Flask
 pytest
 
