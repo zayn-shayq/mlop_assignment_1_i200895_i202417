@@ -3,7 +3,8 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler, OrdinalEncoder
-from sklearn.linear_model import DecisionTreeClassifier, RandomForestClassifier, GradientBoostingClassifier
+from sklearn.linear_model import DecisionTreeClassifier, RandomForestClassifier
+from sklearn.linear_model import GradientBoostingClassifier
 from sklearn.metrics import accuracy_score
 from sklearn.pipeline import make_pipeline
 import pickle
@@ -22,7 +23,8 @@ print(data.info())
 # Data Distribution Visualization
 category_counts = data['Accident_Probability'].value_counts()
 plt.figure(figsize=(8, 8))
-plt.pie(category_counts, labels=category_counts.index, autopct='%1.1f%%', startangle=140)
+plt.pie(category_counts, labels=category_counts.index, autopct='%1.1f%%', 
+        startangle=140)
 plt.title('Pie Chart of Category Distribution of Accident Severity')
 plt.show()
 
@@ -38,12 +40,14 @@ data[categorical_columns] = ordinal_encoder.fit_transform(data[categorical_colum
 
 # Change data type of numeric columns
 numeric_columns = data.select_dtypes(include=['int64', 'float64']).columns.tolist()
-data[numeric_columns] = data[numeric_columns].apply(pd.to_numeric, downcast='float')
+data[numeric_columns] = data[numeric_columns].apply(pd.to_numeric, 
+                                                     downcast='float')
 
 # Split the Dataset
 X = data.drop('Accident_Probability', axis=1)
 y = data['Accident_Probability']
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, 
+                                                    random_state=42)
 
 # Model Training with Comparison
 models = {
@@ -81,6 +85,6 @@ with open('model.pkl', 'rb') as file:
     loaded_model = pickle.load(file)
 
 # Demonstration prediction
-input_data = [2, 2, 2, 2, 2, 2]  # Example input, ensure this matches your model's expectations
+input_data = [2, 2, 2, 2, 2, 2]  # Example input
 prediction = loaded_model.predict([input_data])
 print({'prediction': prediction.tolist()})
