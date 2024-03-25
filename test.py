@@ -4,11 +4,13 @@ import pickle
 
 MODEL_PATH = 'model.pkl'
 
+
 @pytest.fixture
 def loaded_model():
     with open(MODEL_PATH, 'rb') as file:
         model = pickle.load(file)
     return model
+
 
 def test_model_prediction(loaded_model):
     test_input = pd.DataFrame({
