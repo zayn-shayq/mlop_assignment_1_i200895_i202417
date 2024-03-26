@@ -1,7 +1,8 @@
 pipeline {
     agent any
     environment {
-        DOCKERHUB_CREDENTIALS = credentials('docker-hub-credentials')
+        // DOCKERHUB_CREDENTIALS is now just an ID, not the actual credentials.
+        DOCKERHUB_CREDENTIALS = 'docker-hub-credentials' // ID of your credentials in Jenkins
         RECIPIENT = 'i200895@nu.edu.pk'
     }
     stages {
@@ -13,14 +14,16 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script {
-                    def app = docker.build("my-app:${env.BUILD_NUMBER}")
+                    // You can add 'docker' to the registry URL if you have namespaced your image
+                    def app = docker.build("zaynshayq/my-app:${env.BUILD_NUMBER}")
                 }
             }
         }
         stage('Docker Login') {
             steps {
                 script {
-                    docker.withRegistry('', DOCKERHUB_CREDENTIALS) {
+                    docker.withRegistry('https://registry.hub.docker.com', DOCKERHUB_CREDENTIALS) {
+                        // Docker login is handled automatically inside this block
                     }
                 }
             }
@@ -28,7 +31,9 @@ pipeline {
         stage('Push Docker Image') {
             steps {
                 script {
-                    docker.image("my-app:${env.BUILD_NUMBER}").push()
+                    docker.withRegistry('https://registry.hub.docker.com', DOCKERHUB_CREDENTIALS) {
+                        docker.image("zaynshayq/my-app:${env.BUILD_NUMBER}").push()
+                    }
                 }
             }
         }
@@ -49,7 +54,4 @@ pipeline {
             )
         }
     }
-
 }
-
-
