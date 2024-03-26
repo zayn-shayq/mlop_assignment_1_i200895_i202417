@@ -5,4 +5,4 @@ plotly
 seaborn
 scikit-learn
 pytest
-
+flask
